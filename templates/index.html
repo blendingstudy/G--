@@ -1,40 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with AI</title>
+
+    <meta charset="UTF-8">
+    <title>상황극 시나리오 생성기</title>
+    <script>
+        async function generateScenario() {
+            const topic = document.getElementById('topic').value;
+            const response = await fetch('/generate', { // '/generate' 엔드포인트로 변경
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ topic: topic }),
+            });
+            const data = await response.json();
+            document.getElementById('scenario').innerText = data.scenario;
+        }
+
+    </script>
 </head>
 <body>
-    <h1>AI와 대화하기</h1>
-    <form id="chat-form">
-        <input type="text" id="content" name="content" required>
-        <button type="submit">질문하기</button>
-    </form>
-    <div id="response"></div>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#chat-form').on('submit', function(e) {
-                e.preventDefault(); // 폼 제출 방지
-                var userContent = $('#content').val();
-                $.ajax({
-                    url: '/chat',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ "content": userContent }),
-                    dataType: 'json',
-                    success: function(response) {
-                        $('#response').text("AI 응답: " + response.answer);
-                    },
-                    error: function(error) {
-                        console.log(error);
-                        $('#response').text("오류가 발생했습니다.");
-                    }
-                });
-            });
-        });
-    </script>
+    <h1>상황극 시나리오 생성기</h1>
+    <input type="text" id="topic" name="topic" required>
+    <button onclick="generateScenario()">시나리오 생성</button>
+    <h2>생성된 상황극 시나리오</h2>
+    <pre id="scenario"></pre>
 </body>
 </html>

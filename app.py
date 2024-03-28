@@ -29,8 +29,12 @@ def generate_scenario_openai(topic):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "다음은 주제에 기반한 상황극 시나리오입니다:"},
-                {"role": "user", "content": topic}
+                {"role": "system", "content": "다음은 주제에 기반한 5분 분량의 상황극 시나리오입니다:"
+                 +"처음에는 캐릭터에 대한 상세한 정보를 제공합니다"
+                 +"상세한 장면의 묘사와 소리효과와 함께 캐릭터의 대사가 표시됩니다."
+                 +"캐릭터의 장소, 위치, 행동에 따른 지문들이 명확히 표현됩니다."
+                 +"씬 넘버, 지문과 대사, 나레이션, 마음의 소리, 플래시백, 몽타주씬, 교차씬을 포함해서 한국어로 작성합니다"},
+                {"role": "user", "content": topic},
             ]
         )
         # 여기서 첫 번째 응답 메시지의 내용을 반환합니다.

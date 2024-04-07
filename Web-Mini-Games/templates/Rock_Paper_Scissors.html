@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rock Paper Scissors Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script defer src="{{ url_for('static', filename='js/main.js') }}"></script>
+</head>
+<body>
+    <div class="hearts-container">
+        <div id="userHearts" class="hearts">💖💖💖</div>
+        <div id="pcHearts" class="hearts right">💖💖💖</div>
+    </div>
+    <button id="startGame">게임 시작하겠습니까?</button>
+    <div id="chatContainer">
+        <div id="messages"></div>
+        <input type="text" id="userInput" placeholder="가위, 바위, 보 중 하나를 입력하세요." disabled>
+        <button id="submitChoice" disabled>입력하기</button>
+    </div>
+    <div id="countdown"></div>
+    <div id="result"></div>
+    <button id="restart" style="display:none;">Restart Game</button>
+    <button id="exit" style="display:none;" onclick="window.location.href='/';">Exit Game</button>
+</body>
+</html>

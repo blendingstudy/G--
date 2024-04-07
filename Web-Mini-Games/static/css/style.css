@@ -1,0 +1,26 @@
+#chatContainer {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    display: none; /* 처음에는 숨겨져 있음 */
+}
+
+#messages {
+    height: 150px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    padding: 5px;
+    border: 1px solid #ddd;
+}
+
+#countdown {
+    font-size: 48px;
+    color: red;
+    margin: 20px 0;
+}
+
+.heart {
+    width: 50px;
+    height: 50px;
+}

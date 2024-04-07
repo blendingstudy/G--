@@ -57,21 +57,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function startCountdown() {
         let timeLeft = 5;
         countdownDiv.textContent = timeLeft;
-        userInput.disabled = false; // 이 줄을 추가하여 입력 필드를 활성화합니다.
-        userInput.focus(); // 추가적으로 사용자의 입력을 바로 받을 수 있도록 포커스를 설정합니다.
+        userInput.disabled = false; // 사용자 입력을 활성화합니다.
+        userInput.focus(); // 사용자가 바로 입력할 수 있도록 포커스를 설정합니다.
+    
         countdownTimer = setInterval(() => {
             timeLeft--;
             countdownDiv.textContent = timeLeft;
             if (timeLeft === 0) {
                 clearInterval(countdownTimer);
                 countdownDiv.textContent = '땡!';
-                // 5초가 지나면 자동으로 제출하도록 설정할 수 있으나,
-                // 사용자가 직접 제출 버튼을 누르거나 엔터를 치는 것으로 결정할 수 있습니다.
-                // processChoice(userInput.value || getRandomChoice()); // 필요에 따라 이 줄의 주석을 해제하세요.
+                userInput.disabled = true; // 카운트다운이 끝나면 더 이상 입력 받지 않습니다.
+                // 5초가 지나면 사용자의 선택을 처리하거나, 사용자가 선택하지 않았다면 랜덤 선택을 제출합니다.
+                processChoice(userInput.value || getRandomChoice());
             }
         }, 1000);
     }
-    
 
     function getRandomChoice() {
         const choices = ['가위', '바위', '보'];

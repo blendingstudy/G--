@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>카드 맞추기 게임</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/Flip_the_card.css') }}">
+    <script defer src="{{ url_for('static', filename='js/Flip_the_card.js') }}"></script>
+</head>
+<body>
+    <h1>트럼프 카드 맞추기 게임</h1>
+    <div id="game-board">
+        {% for i in range(8) %}
+            <div class="card" onclick="flipCard({{ i }})"></div>
+        {% endfor %}
+    </div>
+</body>
+</html>

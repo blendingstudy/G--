@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>카드 맞추기 게임</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/Flip_the_card.css') }}">
-    <script defer src="{{ url_for('static', filename='js/Flip_the_card.js') }}"></script>
+<meta charset="UTF-8">
+<title>카드 매칭 게임</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/Flip_the_card.css') }}">
+<script defer src="{{ url_for('static', filename='js/Flip_the_card.js') }}"></script>
 </head>
 <body>
-    <h1>트럼프 카드 맞추기 게임</h1>
-    <div id="game-board">
-        {% for i in range(8) %}
-            <div class="card" onclick="flipCard({{ i }})"></div>
-        {% endfor %}
+    <form action="/flip_card_play" method="post">
+        {% for _ in range(2) %}
+            {% for i in range(8) %}
+            <div class="card" style="background-image: url('{{ url_for('static', filename='images/Flip_the_card/img' ~ loop.index0 ~ '.gif') }}')" onclick="flipCard({{ loop.index0 }})"></div>
+            {% endfor %}
+        </form>
     </div>
 </body>
 </html>

@@ -1,17 +1,7 @@
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-}
-
 .card {
     width: 100px;
     height: 150px;
-    background-color: gray;
-    display: inline-block;
     margin: 10px;
-    cursor: pointer;
-}
-
-.card.flipped {
-    background-color: white;
+    display: inline-block;
+    background-size: cover;
 }

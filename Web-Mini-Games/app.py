@@ -192,39 +192,24 @@ def determine_winner(user, computer):
 ### 같은 그림의 카드 맞추기 게임 참고사이트(https://codethem.tistory.com/189)
 ## 웹으로 변경한 코드
 
-def init_game():
-    images = ['img0.png', 'img1.png', 'img2.png', 'img3.png', 'img4.png', 'img5.png', 'img6.png', 'img7.png'] * 2
+@app.route('/flip_card_play', methods=['GET'])
+def flip_card_play():
+    if 'cards' not in session or 'tries' not in session:
+        initialize_game()  # 게임을 초기화하는 함수
+    return render_template('Games/Flip_the_card.html', 
+                           cards=session['cards'], 
+                           tries=session['tries'],
+                           flipped_indices=session.get('flipped_indices', []), 
+                           score=session.get('score', 0))
+
+def initialize_game():
+    images = ['img0.gif', 'img1.gif', 'img2.gif', 'img3.gif', 'img4.gif', 'img5.gif', 'img6.gif', 'img7.gif'] * 2
     random.shuffle(images)
     session['cards'] = images
     session['flipped_indices'] = []
     session['score'] = 0
+    session['tries'] = 0  # 시도 횟수
 
-@app.route('/flip')
-def flip_card():
-    init_game()  # 게임 초기화
-    return render_template('Games/Flip_the_card.html', cards=session['cards'])
-
-@app.route('/flip_card_play', methods=['POST'])
-def flip_card_play():
-    index = int(request.form['index'])
-    if len(session['flipped_indices']) == 2:
-        session['flipped_indices'] = []
-
-    if index not in session['flipped_indices']:
-        session['flipped_indices'].append(index)
-
-    if len(session['flipped_indices']) == 2:
-        idx1, idx2 = session['flipped_indices']
-        if session['cards'][idx1] == session['cards'][idx2]:
-            session['score'] += 1
-            message = "정답!"
-            success = True
-        else:
-            message = "오답!"
-            success = False
-            session['flipped_indices'] = []  # 불일치 시 카드 인덱스 리셋
-        return jsonify(success=success, message=message, cards=session['flipped_indices'])
-    return jsonify(success=False, message="카드를 뒤집으세요")
 
 @app.route('/dino')
 def dino():
@@ -232,4 +217,4 @@ def dino():
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)  # 개발 중에는 debug를 True로 설정

@@ -3,17 +3,78 @@
 <head>
 <meta charset="UTF-8">
 <title>카드 매칭 게임</title>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/Flip_the_card.css') }}">
-<script defer src="{{ url_for('static', filename='js/Flip_the_card.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <form action="/flip_card_play" method="post">
-        {% for _ in range(2) %}
-            {% for i in range(8) %}
-            <div class="card" style="background-image: url('{{ url_for('static', filename='images/Flip_the_card/img' ~ loop.index0 ~ '.gif') }}')" onclick="flipCard({{ loop.index0 }})"></div>
-            {% endfor %}
-        </form>
+    <div class="game-container">
+        {% for i in range(16) %}
+        <div class="card" id="card{{ i }}" style="background-image: url('{{ url_for('static', filename='images/Flip_the_card/default_img.gif') }}')" onclick="flipCard(this, {{ i }})"></div>
+        {% endfor %}
     </div>
+    <button id="restart-game" style="display:none;" onclick="restartGame()">게임 다시 하기</button>
+    <script>
+        let cards = {{ cards | tojson }};
+        let flippedIndices = [];
+        let score = {{ score }};
+        let tries = {{ tries }};
+        const maxTries = 12;
+    
+        window.onload = function() {
+            revealCardsTemporarily();
+        };
+    
+        function revealCardsTemporarily() {
+            document.querySelectorAll('.card').forEach((card, index) => {
+                card.style.backgroundImage = `url('static/images/Flip_the_card/${cards[index]}')`;
+            });
+            setTimeout(() => {
+                document.querySelectorAll('.card').forEach(card => {
+                    card.style.backgroundImage = `url('{{ url_for('static', filename='images/Flip_the_card/default_img.gif') }}')`;
+                });
+            }, 3000);
+        }
+    
+        function flipCard(cardElement, index) {
+            if (flippedIndices.length === 2 || flippedIndices.includes(index)) return;
+            cardElement.style.backgroundImage = `url('static/images/Flip_the_card/${cards[index]}')`;
+            flippedIndices.push(index);
+    
+            if (flippedIndices.length === 2) {
+                tries++;
+                setTimeout(checkMatch, 300);  // 사용자가 두 번째 카드를 볼 시간을 주고 확인
+            }
+        }
+    
+        function checkMatch() {
+            const [first, second] = flippedIndices;
+            if (cards[first] === cards[second]) {
+                score++;
+                // 두 카드가 일치하면 클래스를 유지
+                document.querySelectorAll('.flipped').forEach(card => card.classList.add('matched'));
+            } else {
+                // 일치하지 않으면 두 카드를 다시 뒤집기
+                flippedIndices.forEach(index => {
+                    const cardElement = document.getElementById('card' + index);
+                    cardElement.style.backgroundImage = `url('{{ url_for('static', filename='images/Flip_the_card/default_img.gif') }}')`;
+                    cardElement.classList.remove('flipped');
+                });
+            }
+            flippedIndices = [];  // 카드 인덱스 리셋
+    
+            if (tries >= maxTries || score === 8) {
+                endGame();
+            }
+        }
+    
+        function endGame() {
+            document.getElementById('restart-game').style.display = 'block';
+        }
+    
+        function restartGame() {
+            location.reload();  // 페이지를 새로고침하여 게임을 재시작
+        }
+    </script>
+    
 </body>
 </html>

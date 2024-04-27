@@ -16,3 +16,11 @@
 .card.flipped {
     border: 2px solid green;
 }
+
+.status-bar {
+    text-align: center;
+}
+
+#game-message {
+    text-align: center;
+}

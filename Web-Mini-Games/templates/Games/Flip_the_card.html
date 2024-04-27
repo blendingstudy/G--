@@ -7,23 +7,45 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
+    <div class="status-bar">
+        <p>실행 횟수: <span id="current-tries">0</span>/ 제한 횟수: <span id="max-tries">20</span></p>
+        <p>현재 점수: <span id="current-score">0</span></p>
+    </div>
+    <p id="game-message"></p>
     <div class="game-container">
         {% for i in range(16) %}
         <div class="card" id="card{{ i }}" style="background-image: url('{{ url_for('static', filename='images/Flip_the_card/default_img.gif') }}')" onclick="flipCard(this, {{ i }})"></div>
         {% endfor %}
     </div>
+    
     <button id="restart-game" style="display:none;" onclick="restartGame()">게임 다시 하기</button>
     <script>
-        let cards = {{ cards | tojson }};
+        let cards = shuffle({{ cards | tojson }});
         let flippedIndices = [];
         let score = {{ score }};
         let tries = {{ tries }};
-        const maxTries = 12;
-    
+        let matches = 0;  // 매치된 카드 쌍 수를 추적
+        const maxTries = 20;  // 총 시도 가능한 횟수를 20로 변경
+        
         window.onload = function() {
             revealCardsTemporarily();
+            updateStatus();
         };
-    
+        
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // ES6 배열 요소 교환 문법
+            }
+            return array;
+        }
+        
+        function updateStatus() {
+            document.getElementById('current-tries').textContent = tries;
+            document.getElementById('current-score').textContent = score;
+            document.getElementById('max-tries').textContent = maxTries;
+        }
+        
         function revealCardsTemporarily() {
             document.querySelectorAll('.card').forEach((card, index) => {
                 card.style.backgroundImage = `url('static/images/Flip_the_card/${cards[index]}')`;
@@ -34,47 +56,58 @@
                 });
             }, 3000);
         }
-    
+        
         function flipCard(cardElement, index) {
-            if (flippedIndices.length === 2 || flippedIndices.includes(index)) return;
+            if (flippedIndices.length === 2 || flippedIndices.includes(index) || cardElement.classList.contains('matched')) {
+                if (cardElement.classList.contains('matched')) {
+                    alert("이미 뒤집어진 카드입니다.");
+                }
+                return;
+            }
             cardElement.style.backgroundImage = `url('static/images/Flip_the_card/${cards[index]}')`;
             flippedIndices.push(index);
-    
+            
             if (flippedIndices.length === 2) {
                 tries++;
-                setTimeout(checkMatch, 300);  // 사용자가 두 번째 카드를 볼 시간을 주고 확인
+                setTimeout(checkMatch, 300);
+                updateStatus();
             }
         }
-    
+        
         function checkMatch() {
             const [first, second] = flippedIndices;
             if (cards[first] === cards[second]) {
-                score++;
-                // 두 카드가 일치하면 클래스를 유지
-                document.querySelectorAll('.flipped').forEach(card => card.classList.add('matched'));
+                matches++;  // 매치 수 증가
+                const points = (tries <= 7) ? 50 : (tries <= 15) ? 30 : 10;
+                score += points;
+                document.getElementById('card' + first).classList.add('matched');
+                document.getElementById('card' + second).classList.add('matched');
             } else {
-                // 일치하지 않으면 두 카드를 다시 뒤집기
                 flippedIndices.forEach(index => {
                     const cardElement = document.getElementById('card' + index);
                     cardElement.style.backgroundImage = `url('{{ url_for('static', filename='images/Flip_the_card/default_img.gif') }}')`;
-                    cardElement.classList.remove('flipped');
                 });
             }
-            flippedIndices = [];  // 카드 인덱스 리셋
-    
-            if (tries >= maxTries || score === 8) {
-                endGame();
+            flippedIndices = [];
+            updateStatus();
+            
+            if (tries >= maxTries) {
+                endGame(false);
+            } else if (matches === 8) {  // 모든 카드 쌍이 맞춰졌는지 확인
+                endGame(true);
             }
         }
-    
-        function endGame() {
+        
+        function endGame(won) {
             document.getElementById('restart-game').style.display = 'block';
-        }
-    
-        function restartGame() {
-            location.reload();  // 페이지를 새로고침하여 게임을 재시작
+            const message = won ? "축하합니다! 게임에서 승리하셨습니다!" : "게임 오버";
+            document.getElementById('game-message').textContent = message;
         }
     </script>
+    
+    
+    
+    
     
 </body>
 </html>

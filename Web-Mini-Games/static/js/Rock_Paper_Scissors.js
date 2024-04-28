@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function resetGame() {
+        clearInterval(countdownTimer);
         userHearts = 3;
         pcHearts = 3;
         updateHearts();
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chatContainer.style.display = 'none';
         restartButton.style.display = 'none';
         exitButton.style.display = 'none';
+        submitChoiceButton.disabled = false;
     }
 
     startGameButton.addEventListener('click', () => {
@@ -36,12 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     submitChoiceButton.addEventListener('click', () => {
-        processChoice(userInput.value || getRandomChoice());
+        if (validateInput()) {
+            processChoice(userInput.value);
+        }
     });
 
     userInput.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            processChoice(userInput.value || getRandomChoice());
+        if (event.key === 'Enter' && validateInput()) {
+            processChoice(userInput.value);
         }
     });
 
@@ -54,20 +58,20 @@ document.addEventListener('DOMContentLoaded', () => {
         messagesDiv.appendChild(messageElement);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
+
     function startCountdown() {
         let timeLeft = 5;
         countdownDiv.textContent = timeLeft;
-        userInput.disabled = false; // 사용자 입력을 활성화합니다.
-        userInput.focus(); // 사용자가 바로 입력할 수 있도록 포커스를 설정합니다.
-    
+        userInput.disabled = false;
+        userInput.focus();
+
         countdownTimer = setInterval(() => {
             timeLeft--;
             countdownDiv.textContent = timeLeft;
             if (timeLeft === 0) {
                 clearInterval(countdownTimer);
                 countdownDiv.textContent = '땡!';
-                userInput.disabled = true; // 카운트다운이 끝나면 더 이상 입력 받지 않습니다.
-                // 5초가 지나면 사용자의 선택을 처리하거나, 사용자가 선택하지 않았다면 랜덤 선택을 제출합니다.
+                userInput.disabled = true;
                 processChoice(userInput.value || getRandomChoice());
             }
         }, 1000);
@@ -78,7 +82,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return choices[Math.floor(Math.random() * choices.length)];
     }
 
+    function validateInput() {
+        if (!['가위', '바위', '보'].includes(userInput.value)) {
+            alert('가위, 바위, 보 중 하나를 입력하세요.');
+            userInput.value = '';
+            return false;
+        }
+        return true;
+    }
+
     function processChoice(choice) {
+        // 선택이 유효하지 않으면 오류 메시지를 표시하고, 함수를 종료합니다.
+        if (!['가위', '바위', '보'].includes(choice)) {
+            alert('가위, 바위, 보 중 하나를 입력하세요.');
+            userInput.value = '';
+            userInput.focus(); // 사용자가 다시 입력할 수 있도록 포커스를 줍니다.
+            return; // 함수를 여기서 종료합니다. 더 이상의 타이머 로직은 실행되지 않습니다.
+        }
         clearInterval(countdownTimer);
         const pcChoice = getRandomChoice();
         const result = determineWinner(choice, pcChoice);
@@ -103,10 +123,13 @@ document.addEventListener('DOMContentLoaded', () => {
             exitButton.style.display = 'inline';
             userInput.disabled = true;
             submitChoiceButton.disabled = true;
+            clearInterval(countdownTimer); // 게임 오버 시 타이머를 멈춥니다.
         } else {
+            userInput.disabled = false; // 사용자 입력을 다시 활성화합니다.
             setTimeout(startCountdown, 1000); // 다음 라운드 준비
         }
     }
+    
 
     updateHearts(); // 초기 하트 상태 업데이트
 });
